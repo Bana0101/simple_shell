@@ -1,33 +1,33 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
-#include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <limits.h>
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <errno.h>
 
-#define READ_BUF_SIZE 1024
-#define WRITE_BUF_SIZE 1024
-#define BUF_FLUSH -1
+extern char **environ;
 
+#define WRITE_BUF_SIZE 1024
+#define READ_BUF_SIZE 1024
+#define BUF_FLUSH -1
 #define CMD_NORM	0
 #define CMD_OR		1
 #define CMD_AND		2
 #define CMD_CHAIN	3
-#define CONVERT_LOWERCASE	1
-#define CONVERT_UNSIGNED	2
 #define USE_GETLINE 0
 #define USE_STRTOK 0
+#define CONVERT_UNSIGNED	2
+#define CONVERT_LOWERCASE	1
 #define HIST_FILE	".simple_shell_history"
 #define HIST_MAX	4096
 
-extern char **environ;
 
 /**
  * struct liststr - a list
@@ -45,26 +45,26 @@ typedef struct liststr
 
 /**
  * struct passinfo -  a function,
- * allowing uniform prototype for function pointer struct
- * @arg: a string generated from getline containing arguements
- * @argv:an array of strings generated from arg
- * @path: a string path for the current command
- * @argc: the argument count
- * @line_count: the error count
- * @err_num: the error code for exit()s
- * @linecount_flag: if on count this line of input
- * @fname: the program filename
- * @env: linked list local copy of environ
- * @environ: custom modified copy of environ from LL env
- * @history: the history node
- * @alias: the alias node
- * @env_changed: on if environ was changed
- * @status: the return status of the last exec'd command
- * @cmd_buf: address of pointer to cmd_buf, on if chaining
- * @cmd_buf_type: CMD_type ||, &&, ;
- * @readfd: the fd from which to read line input
- * @histcount: the history line number count
+ * @argv: tokenize the argv
+ * @arg: the arguments (command line)
+ * @argc: the number of arguments
+ * @line_count: the number line err
+ * @err_num: for exit
+ * @path: the whole cmd (with path)
+ * @fname: the file name of the programm
+ * @environ: the environ
+ * @history: the data node
+ * @linecount_flag: an integer
+ * @env: a pointer that get the environ
+ * @alias: the alias
+ * @status: to restore the return the last status
+ * @cmd_buf: integer
+ * @env_changed: in the case that the environ change
+ * @cmd_buf_type: the type of the command line
+ * @readfd: the file descriptor
+ * @histcount: the data of the line count
  */
+
 typedef struct passinfo
 {
 	char *arg;
@@ -81,9 +81,8 @@ typedef struct passinfo
 	char **environ;
 	int env_changed;
 	int status;
-
-	char **cmd_buf; /* pointer to cmd ; chain buffer, for memory mangement */
-	int cmd_buf_type; /* CMD_type ||, &&, ; */
+	char **cmd_buf;
+	int cmd_buf_type;
 	int readfd;
 	int histcount;
 } info_t;
@@ -93,9 +92,9 @@ typedef struct passinfo
 		0, 0, 0}
 
 /**
- * struct builtin - a struct list
- * @type: type of builtin
- * @func: the function
+ * struct builtin - list
+ * @type: the type
+ * @func: the function to return
  */
 
 typedef struct builtin
@@ -110,25 +109,24 @@ void _get_the_command(info_t *);
 void fork_with_command(info_t *);
 int exec_function(info_t *, char **);
 char *find_path(info_t *, char *, char *);
+char *_strcat(char *, char *);
 int loophsh(char **);
 void p_puts(char *);
 int std_putchar(char);
+char *_strchr(char *, char);
 int set_fd(char, int);
 int puts_fd(char *, int);
 int _strlen(char *);
 int _strcmp(char *, char *);
 char *check_if_start(const char *, const char *);
-char *_strcat(char *, char *);
-char *_strncat(char *, char *, int);
-char *_strcpy(char *, char *);
 char *_strdup(const char *);
 int _putchar(char);
-char *_strncpy(char *, char *, int);
-char *_strchr(char *, char);
 void _puts(char *);
 char **ignore_separators(char *, char *);
+char *_strncpy(char *, char *, int);
 char **ignore_separators2(char *, char);
 char *set_const_byte(char *, char, unsigned int);
+char *_strncat(char *, char *, int);
 void matrix_to_free(char **);
 void *new_allocat(void *, unsigned int, unsigned int);
 int free_and_null(void **);
@@ -141,6 +139,7 @@ void p_error(info_t *, char *);
 int print_d(int, int);
 char *convert_number(long int, int, int);
 void rm_comments(char *);
+char *_strcpy(char *, char *);
 int exec_exit(info_t *);
 int exec_cd(info_t *);
 int exec_help(info_t *);
